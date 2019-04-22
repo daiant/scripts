@@ -8,43 +8,34 @@ import random
 import sys
 import argparse
 
-def getPath():
-	user = os.getenv('USER')
-	path = '/home/' + user + '/Pictures/Wallpapers/'
-	if not os.path.exists(path):
-		os.mkdir(path)
-	return path
-def getRandomPath():
+def getPhotos():
+	list = []
 	try:
-		dir = random.choice(getDirectories())
-		print(dir)
-		return dir
+		for dir in getDirectories():
+			for img in os.listdir(dir):
+				path = os.path.abspath(dir)
+				list.append(os.path.join(path,img))
+
+			return list
 	except:
 		print("Empty directory list")
 		exit()
 
-
-def download():
-	path = getRandomPath()
-	try:
-		choice = random.choice(os.listdir(path))
-		return os.path.join(path,choice)
-	except:
-		pass
-
+def getRandomPhoto():
+	return random.choice(getPhotos())
 
 def change_wallpaper(dir):
+	# Tenemos una foto pasada como argumento
 	if(dir!=None):
 		full_path=os.path.abspath(dir)
 	else:
-		full_path=download()
+		full_path=getRandomPhoto()
 
 	if full_path is None:
 		print("Directory empty. Aborting...")
 	else:
 		# Feh se encarga de la whitelist
 		os.system("feh --bg-scale "+full_path)
-
 
 if __name__ == '__main__':
   ap = argparse.ArgumentParser()
@@ -67,5 +58,4 @@ if __name__ == '__main__':
   elif(args["list"] != False):
 	  stringDirectories()
 	  exit()
-
   change_wallpaper(args["set"])
